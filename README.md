@@ -19,8 +19,10 @@ npm run dev
 
 ## İçerik güncelleme
 
-Tüm düzenlenebilir içerik `src/App.jsx` dosyasının EN ÜSTÜNDE:
-- `DUYURULAR` listesi → yeni ilan eklemek için
-- `PARTNERLER` listesi → partner üniversite eklemek/çıkarmak için
+Tüm düzenlenebilir içerik `src/data.js` dosyasında:
+- `DUYURULAR` → yeni ilan ekle; `popup: true` verirsen açılışta pop-up olur
+- `PARTNERLER` → partner üniversite ekle/çıkar
+- `HAREKETLILIK` → her türün sayfa içerikleri (koşullar, süreç, belgeler)
+- `ISTATISTIKLER` → ana sayfadaki sayaçlar (örnek verileri gerçekleriyle değiştir!)
 
 Değişikliği GitHub'a push'ladığında Vercel otomatik yeniden deploy eder.

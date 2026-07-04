@@ -2,18 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --lacivert: #06122B;      /* ana zemin */
+  --lacivert-2: #0B1B3A;    /* kart zemini */
+  --lacivert-3: #14264D;    /* hover / kenarlık */
+  --fb-navy: #163962;
+  --sari: #FFD500;
+  --metin: #DDE6F2;
+  --soluk: #8FA0BC;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body, #root { background: #0C0C0C; }
+html, body, #root { background: var(--lacivert); }
 html { scroll-behavior: smooth; }
 body { font-family: 'Kanit', sans-serif; }
 
 .hero-heading {
-  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  background: linear-gradient(180deg, #52678F 0%, #C9D8EC 78%, #FFD500 165%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+/* Sarı şerit marquee */
+@keyframes kaydir {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-ic { animation: kaydir 28s linear infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
+  .marquee-ic { animation: none !important; }
 }
+select, input { font-family: 'Kanit', sans-serif; }
