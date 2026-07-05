@@ -23,8 +23,8 @@ export default function Navbar() {
         className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 md:px-10 py-4 md:py-5"
         style={{ background: "rgba(6,18,43,0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid #14264D" }}
       >
-        <Link to="/" onClick={kapat} className="font-black uppercase tracking-tight leading-none" style={{ color: "#DDE6F2" }}>
-          <span style={{ color: "#FFD500" }}>FBÜ</span> Erasmus+
+        <Link to="/" onClick={kapat} className="flex items-center rounded-full px-3.5 py-1.5" style={{ background: "#FFFFFF" }}>
+          <img src="/fbu-logo.png" alt="Fenerbahçe Üniversitesi" className="h-8 md:h-9 w-auto" />
         </Link>
 
         {/* Masaüstü menü */}
@@ -66,7 +66,6 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
           {[
-            ["Duyurular", "#duyurular"],
             ["Partnerler", "#partnerler"],
             ["İletişim", "#iletisim"],
           ].map(([ad, hash]) => (
@@ -132,7 +131,6 @@ export default function Navbar() {
               )}
             </AnimatePresence>
             {[
-              ["Duyurular", "#duyurular"],
               ["Partnerler", "#partnerler"],
               ["İletişim", "#iletisim"],
             ].map(([ad, hash], i) => (

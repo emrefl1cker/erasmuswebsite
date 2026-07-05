@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { Search, MapPin, Calendar, Megaphone, ArrowRight, X, GraduationCap, Briefcase, Presentation, BookOpen } from "lucide-react";
+import { Search, MapPin, Calendar, Megaphone, ArrowRight, X, GraduationCap, Briefcase, Presentation, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { DUYURULAR, PARTNERLER, HAREKETLILIK, ISTATISTIKLER, ILETISIM } from "./data.js";
 
 const IKONLAR = { ogrenim: GraduationCap, staj: Briefcase, "ders-verme": Presentation, "egitim-alma": BookOpen };
@@ -121,6 +121,86 @@ function PopupDuyuru() {
   );
 }
 
+/* Hero'daki dönen duyuru kartı */
+function DuyuruRotator() {
+  const [aktif, setAktif] = useState(0);
+  const [duraklat, setDuraklat] = useState(false);
+
+  useEffect(() => {
+    if (duraklat) return;
+    const t = setInterval(() => setAktif((a) => (a + 1) % DUYURULAR.length), 5000);
+    return () => clearInterval(t);
+  }, [duraklat]);
+
+  const d = DUYURULAR[aktif];
+
+  return (
+    <div
+      id="duyurular"
+      className="max-w-2xl mx-auto w-full px-5"
+      onMouseEnter={() => setDuraklat(true)}
+      onMouseLeave={() => setDuraklat(false)}
+    >
+      <div className="relative rounded-[24px] sm:rounded-[30px] border-2 overflow-hidden" style={{ background: "#0B1B3A", borderColor: "#14264D" }}>
+        <AnimatePresence mode="wait">
+          <motion.article
+            key={aktif}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            className="p-6 sm:p-8 min-h-[190px] sm:min-h-[180px]"
+          >
+            <div className="flex flex-wrap items-center gap-2.5 mb-3">
+              <Megaphone size={15} style={{ color: "#FFD500" }} />
+              <span className="flex items-center gap-1.5 text-xs font-light" style={{ color: "#8FA0BC" }}>
+                <Calendar size={12} /> {d.tarih}
+              </span>
+              <span className="text-xs font-medium uppercase tracking-widest rounded-full px-3 py-0.5" style={{ background: "#14264D", color: "#DDE6F2" }}>
+                {d.etiket}
+              </span>
+              {d.yeni && (
+                <span className="text-xs font-semibold uppercase tracking-widest rounded-full px-3 py-0.5" style={{ background: "#FFD500", color: "#06122B" }}>
+                  Yeni
+                </span>
+              )}
+            </div>
+            <h3 className="font-medium mb-2 text-left" style={{ color: "#DDE6F2", fontSize: "clamp(1rem, 2.2vw, 1.3rem)" }}>
+              {d.baslik}
+            </h3>
+            <p className="font-light leading-relaxed text-left" style={{ color: "#8FA0BC", fontSize: "clamp(0.82rem, 1.5vw, 0.95rem)" }}>
+              {d.ozet}
+            </p>
+          </motion.article>
+        </AnimatePresence>
+
+        {/* Kontroller */}
+        <div className="flex items-center justify-between px-6 sm:px-8 pb-5">
+          <div className="flex gap-2">
+            {DUYURULAR.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setAktif(i)}
+                aria-label={`Duyuru ${i + 1}`}
+                className="h-2 rounded-full transition-all duration-300"
+                style={{ width: i === aktif ? 26 : 8, background: i === aktif ? "#FFD500" : "#14264D" }}
+              />
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => setAktif((a) => (a - 1 + DUYURULAR.length) % DUYURULAR.length)} aria-label="Önceki" className="p-2 rounded-full border hover:bg-[#14264D] transition-colors" style={{ borderColor: "#14264D", color: "#DDE6F2" }}>
+              <ChevronLeft size={16} />
+            </button>
+            <button onClick={() => setAktif((a) => (a + 1) % DUYURULAR.length)} aria-label="Sonraki" className="p-2 rounded-full border hover:bg-[#14264D] transition-colors" style={{ borderColor: "#14264D", color: "#DDE6F2" }}>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* Harf harf açılan hero başlığı */
 function HeroBaslik({ metin }) {
   return (
@@ -170,38 +250,13 @@ export default function Home() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...gecis, delay: 0.8 }}
-          className="text-center font-medium uppercase tracking-[0.35em] mt-5 px-4"
-          style={{ color: "#FFD500", fontSize: "clamp(0.7rem, 1.6vw, 1.2rem)" }}
+          className="text-center font-medium uppercase tracking-[0.35em] mt-4 mb-8 px-4"
+          style={{ color: "#FFD500", fontSize: "clamp(0.65rem, 1.3vw, 1rem)" }}
         >
-          Fenerbahçe Üniversitesi
+          Fenerbahçe Üniversitesi · Güncel Duyurular
         </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...gecis, delay: 0.95 }}
-          className="text-center font-light max-w-md mx-auto mt-6 px-6 leading-relaxed"
-          style={{ color: "#8FA0BC", fontSize: "clamp(0.9rem, 1.8vw, 1.1rem)" }}
-        >
-          Avrupa'da eğitim, staj ve akademik iş birliği için kapınız. Hareketlilik türünü seç, yolculuğuna başla.
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...gecis, delay: 1.1 }}
-          className="flex justify-center mt-9"
-        >
-          <a
-            href="#hareketlilik"
-            className="rounded-full px-9 py-3.5 sm:px-11 sm:py-4 text-xs sm:text-sm font-medium uppercase tracking-widest text-white"
-            style={{
-              background: "linear-gradient(123deg, #001030 7%, #163962 45%, #1F5FA8 72%, #FFD500 130%)",
-              boxShadow: "0 4px 4px rgba(22,57,98,.25), 4px 4px 12px #1F5FA8 inset",
-              outline: "2px solid #fff",
-              outlineOffset: "-3px",
-            }}
-          >
-            Keşfet
-          </a>
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ ...gecis, delay: 0.95 }}>
+          <DuyuruRotator />
         </motion.div>
 
         {/* İstatistikler */}
@@ -243,70 +298,43 @@ export default function Home() {
               <FadeIn key={h.slug} delay={i * 0.08} y={30}>
                 <Link
                   to={`/hareketlilik/${h.slug}`}
-                  className="group block rounded-[28px] sm:rounded-[34px] p-7 sm:p-9 border-2 transition-colors duration-200 h-full hover:border-[#FFD500]"
+                  className="group block rounded-[28px] sm:rounded-[34px] border-2 transition-colors duration-200 h-full overflow-hidden hover:border-[#FFD500]"
                   style={{ background: "#0B1B3A", borderColor: "#14264D" }}
                 >
-                  <div className="flex items-start justify-between mb-6">
-                    <span className="font-black leading-none" style={{ color: "#14264D", fontSize: "clamp(3rem, 8vw, 5rem)" }}>
-                      {h.no}
-                    </span>
-                    <span className="text-xs font-semibold rounded-full px-3 py-1 uppercase tracking-widest" style={{ background: "#163962", color: "#FFD500" }}>
+                  {/* Görsel: alttan yukarı doğru kaybolan (fade-out) maske */}
+                  <div className="relative h-44 sm:h-48 overflow-hidden">
+                    <img
+                      src={`/hareketlilik/${h.slug}.jpg`}
+                      alt={h.ad}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      style={{
+                        maskImage: "linear-gradient(to top, black 30%, transparent 100%)",
+                        WebkitMaskImage: "linear-gradient(to top, black 30%, transparent 100%)",
+                      }}
+                    />
+                    <span className="absolute top-4 right-4 text-xs font-semibold rounded-full px-3 py-1 uppercase tracking-widest" style={{ background: "#163962", color: "#FFD500" }}>
                       {h.grup} · {h.kod}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <Ikon size={24} style={{ color: "#FFD500" }} />
-                    <h3 className="font-medium uppercase" style={{ color: "#DDE6F2", fontSize: "clamp(1rem, 2.2vw, 1.35rem)" }}>
-                      {h.ad}
-                    </h3>
+                  <div className="p-7 sm:p-8 pt-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Ikon size={24} style={{ color: "#FFD500" }} />
+                      <h3 className="font-medium uppercase" style={{ color: "#DDE6F2", fontSize: "clamp(1rem, 2.2vw, 1.35rem)" }}>
+                        {h.ad}
+                      </h3>
+                    </div>
+                    <p className="font-light leading-relaxed mb-5" style={{ color: "#8FA0BC", fontSize: "clamp(0.85rem, 1.6vw, 1rem)" }}>
+                      {h.kisa}
+                    </p>
+                    <span className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest transition-transform duration-200 group-hover:translate-x-1" style={{ color: "#FFD500" }}>
+                      Detaylar <ArrowRight size={15} />
+                    </span>
                   </div>
-                  <p className="font-light leading-relaxed mb-5" style={{ color: "#8FA0BC", fontSize: "clamp(0.85rem, 1.6vw, 1rem)" }}>
-                    {h.kisa}
-                  </p>
-                  <span className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest transition-transform duration-200 group-hover:translate-x-1" style={{ color: "#FFD500" }}>
-                    Detaylar <ArrowRight size={15} />
-                  </span>
                 </Link>
               </FadeIn>
             );
           })}
-        </div>
-      </section>
-
-      {/* ==================== DUYURULAR ==================== */}
-      <section id="duyurular" className="px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-28 rounded-t-[40px] sm:rounded-t-[50px]" style={{ background: "#0B1B3A" }}>
-        <FadeIn y={40}>
-          <h2 className="hero-heading font-black uppercase text-center leading-none tracking-tight mb-14 sm:mb-18" style={{ fontSize: "clamp(2.4rem, 9vw, 130px)" }}>
-            Duyurular
-          </h2>
-        </FadeIn>
-        <div className="max-w-4xl mx-auto flex flex-col gap-5">
-          {DUYURULAR.map((d, i) => (
-            <FadeIn key={i} delay={i * 0.07} y={30}>
-              <article className="rounded-[24px] sm:rounded-[30px] p-6 sm:p-8 border-2 transition-colors duration-200 hover:border-[#FFD500]" style={{ borderColor: "#14264D", background: "#06122B" }}>
-                <div className="flex flex-wrap items-center gap-2.5 mb-3">
-                  <Megaphone size={15} style={{ color: "#FFD500" }} />
-                  <span className="flex items-center gap-1.5 text-xs sm:text-sm font-light" style={{ color: "#8FA0BC" }}>
-                    <Calendar size={13} /> {d.tarih}
-                  </span>
-                  <span className="text-xs font-medium uppercase tracking-widest rounded-full px-3 py-1" style={{ background: "#14264D", color: "#DDE6F2" }}>
-                    {d.etiket}
-                  </span>
-                  {d.yeni && (
-                    <span className="text-xs font-semibold uppercase tracking-widest rounded-full px-3 py-1" style={{ background: "#FFD500", color: "#06122B" }}>
-                      Yeni
-                    </span>
-                  )}
-                </div>
-                <h3 className="font-medium mb-2" style={{ color: "#DDE6F2", fontSize: "clamp(1.05rem, 2.2vw, 1.45rem)" }}>
-                  {d.baslik}
-                </h3>
-                <p className="font-light leading-relaxed" style={{ color: "#8FA0BC", fontSize: "clamp(0.85rem, 1.6vw, 1rem)" }}>
-                  {d.ozet}
-                </p>
-              </article>
-            </FadeIn>
-          ))}
         </div>
       </section>
 
