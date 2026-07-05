@@ -9,5 +9,4 @@
 export const projectId = "k3kqvj9o";
 export const dataset = "production";
 
-// projectId girilmediyse site data.js'deki yedek içerikle çalışır
 export const cmsAktif = projectId !== "BURAYA_PROJECT_ID" && projectId.length > 3;
