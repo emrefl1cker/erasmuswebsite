@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Search, MapPin, Calendar, Megaphone, ArrowRight, X, GraduationCap, Briefcase, Presentation, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
-import { DUYURULAR, PARTNERLER, HAREKETLILIK, ISTATISTIKLER, ILETISIM } from "./data.js";
+import { HAREKETLILIK, ILETISIM } from "./data.js";
+import { useDuyurular, usePartnerler, useIstatistikler } from "./sanity/veri.js";
 
 const IKONLAR = { ogrenim: GraduationCap, staj: Briefcase, "ders-verme": Presentation, "egitim-alma": BookOpen };
 const gecis = { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] };
@@ -54,8 +55,8 @@ function Sayac({ deger, ek, etiket }) {
 }
 
 /* Açılışta gösterilen pop-up duyuru */
-function PopupDuyuru() {
-  const duyuru = DUYURULAR.find((d) => d.popup);
+function PopupDuyuru({ duyurular }) {
+  const duyuru = duyurular.find((d) => d.popup);
   const [acik, setAcik] = useState(false);
 
   useEffect(() => {
@@ -122,17 +123,18 @@ function PopupDuyuru() {
 }
 
 /* Hero'daki dönen duyuru kartı */
-function DuyuruRotator() {
+function DuyuruRotator({ duyurular }) {
   const [aktif, setAktif] = useState(0);
   const [duraklat, setDuraklat] = useState(false);
 
   useEffect(() => {
     if (duraklat) return;
-    const t = setInterval(() => setAktif((a) => (a + 1) % DUYURULAR.length), 5000);
+    const t = setInterval(() => setAktif((a) => (a + 1) % duyurular.length), 5000);
     return () => clearInterval(t);
-  }, [duraklat]);
+  }, [duraklat, duyurular.length]);
 
-  const d = DUYURULAR[aktif];
+  const d = duyurular[Math.min(aktif, duyurular.length - 1)];
+  if (!d) return null;
 
   return (
     <div
@@ -177,7 +179,7 @@ function DuyuruRotator() {
         {/* Kontroller */}
         <div className="flex items-center justify-between px-6 sm:px-8 pb-5">
           <div className="flex gap-2">
-            {DUYURULAR.map((_, i) => (
+            {duyurular.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setAktif(i)}
@@ -188,10 +190,10 @@ function DuyuruRotator() {
             ))}
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setAktif((a) => (a - 1 + DUYURULAR.length) % DUYURULAR.length)} aria-label="Önceki" className="p-2 rounded-full border hover:bg-[#14264D] transition-colors" style={{ borderColor: "#14264D", color: "#DDE6F2" }}>
+            <button onClick={() => setAktif((a) => (a - 1 + duyurular.length) % duyurular.length)} aria-label="Önceki" className="p-2 rounded-full border hover:bg-[#14264D] transition-colors" style={{ borderColor: "#14264D", color: "#DDE6F2" }}>
               <ChevronLeft size={16} />
             </button>
-            <button onClick={() => setAktif((a) => (a + 1) % DUYURULAR.length)} aria-label="Sonraki" className="p-2 rounded-full border hover:bg-[#14264D] transition-colors" style={{ borderColor: "#14264D", color: "#DDE6F2" }}>
+            <button onClick={() => setAktif((a) => (a + 1) % duyurular.length)} aria-label="Sonraki" className="p-2 rounded-full border hover:bg-[#14264D] transition-colors" style={{ borderColor: "#14264D", color: "#DDE6F2" }}>
               <ChevronRight size={16} />
             </button>
           </div>
@@ -221,14 +223,17 @@ function HeroBaslik({ metin }) {
 }
 
 export default function Home() {
+  const duyurular = useDuyurular();
+  const partnerler = usePartnerler();
+  const istatistikler = useIstatistikler();
   const [ulkeFiltre, setUlkeFiltre] = useState("Tümü");
   const [turFiltre, setTurFiltre] = useState("Tümü");
   const [arama, setArama] = useState("");
 
-  const ulkeler = ["Tümü", ...[...new Set(PARTNERLER.map((p) => p.ulke))].sort()];
+  const ulkeler = ["Tümü", ...[...new Set(partnerler.map((p) => p.ulke))].sort()];
   const turler = ["Tümü", "Öğrenim", "Staj", "Ders Verme", "Eğitim Alma"];
 
-  const filtreli = PARTNERLER.filter((p) => {
+  const filtreli = partnerler.filter((p) => {
     const q = arama.toLocaleLowerCase("tr");
     return (
       (ulkeFiltre === "Tümü" || p.ulke === ulkeFiltre) &&
@@ -239,7 +244,7 @@ export default function Home() {
 
   return (
     <div style={{ overflowX: "clip" }}>
-      <PopupDuyuru />
+      <PopupDuyuru duyurular={duyurular} />
 
       {/* ==================== HERO ==================== */}
       <section className="min-h-screen flex flex-col justify-center pt-20 pb-10">
@@ -256,12 +261,12 @@ export default function Home() {
           Fenerbahçe Üniversitesi · Güncel Duyurular
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ ...gecis, delay: 0.95 }}>
-          <DuyuruRotator />
+          <DuyuruRotator duyurular={duyurular} />
         </motion.div>
 
         {/* İstatistikler */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto w-full mt-16 sm:mt-20 px-6">
-          {ISTATISTIKLER.map((s) => (
+          {istatistikler.map((s) => (
             <Sayac key={s.etiket} {...s} />
           ))}
         </div>

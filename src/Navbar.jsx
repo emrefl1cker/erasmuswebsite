@@ -3,12 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { HAREKETLILIK } from "./data.js";
+import { useSayfalar } from "./sanity/veri.js";
 
 export default function Navbar() {
   const [mobilAcik, setMobilAcik] = useState(false);
   const [dropAcik, setDropAcik] = useState(false);
   const [mobilDropAcik, setMobilDropAcik] = useState(false);
   const konum = useLocation();
+  const sayfalar = useSayfalar(); // CMS'ten gelen ekstra menü sekmeleri
 
   const anaSayfaLink = (hash) => (konum.pathname === "/" ? hash : `/${hash}`);
 
@@ -65,6 +67,16 @@ export default function Navbar() {
               )}
             </AnimatePresence>
           </div>
+          {sayfalar.map((sf) => (
+            <Link
+              key={sf.slug}
+              to={`/sayfa/${sf.slug}`}
+              className="text-sm lg:text-base font-medium uppercase tracking-wider hover:opacity-70 transition-opacity"
+              style={{ color: "#DDE6F2" }}
+            >
+              {sf.baslik}
+            </Link>
+          ))}
           {[
             ["Partnerler", "#partnerler"],
             ["İletişim", "#iletisim"],
@@ -130,6 +142,13 @@ export default function Navbar() {
                 </motion.div>
               )}
             </AnimatePresence>
+            {sayfalar.map((sf, i) => (
+              <motion.div key={sf.slug} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 + i * 0.05 }}>
+                <Link to={`/sayfa/${sf.slug}`} onClick={kapat} className="block text-3xl font-black uppercase tracking-tight py-3" style={{ color: "#DDE6F2" }}>
+                  {sf.baslik}
+                </Link>
+              </motion.div>
+            ))}
             {[
               ["Partnerler", "#partnerler"],
               ["İletişim", "#iletisim"],

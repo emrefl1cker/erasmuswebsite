@@ -1,28 +1,42 @@
-# FBÜ Erasmus+ Sitesi
+# FBÜ Erasmus+ Sitesi (CMS'li)
 
-Fenerbahçe Üniversitesi Erasmus+ Koordinatörlüğü web sitesi (React + Vite + Tailwind).
+React + Vite + Tailwind + Framer Motion + Sanity CMS.
 
-## Vercel'e Deploy (en kolay yol)
+## İlk kurulum (bir kere yapılır)
 
-1. github.com'da yeni repo aç (örn. `fbu-erasmus`)
-2. Bu klasördeki dosyaları repoya yükle ("uploading an existing file" linkiyle sürükle-bırak da olur)
-3. vercel.com → "Add New Project" → GitHub reponu seç → Import
-4. Hiçbir ayarı değiştirme (Vercel, Vite'ı otomatik tanır) → Deploy
-5. 1 dakika sonra siten `xxx.vercel.app` adresinde yayında
+### 1. Vercel'e deploy
+- Dosyaları GitHub repona yükle → Vercel otomatik kurar (önceki gibi)
 
-## Yerel çalıştırma (istersen)
+### 2. Sanity hesabı ve proje
+1. **sanity.io** → ücretsiz hesap aç (Google ile giriş yeterli)
+2. **sanity.io/manage** → **Create new project** → isim ver (örn. "fbu-erasmus")
+3. Dataset sorulursa: **production**, görünürlük **public**
+4. Proje sayfasında **Project ID** yazar (8 haneli) → kopyala
 
-```
-npm install
-npm run dev
-```
+### 3. Project ID'yi siteye tanıt
+- `src/sanity/ayarlar.js` dosyasını aç
+- `BURAYA_PROJECT_ID` yerine kendi ID'ni yapıştır
+- GitHub'a commit'le → Vercel yeniden kurar
 
-## İçerik güncelleme
+### 4. CORS izni (panelin çalışması için şart)
+- **sanity.io/manage** → projen → **API** sekmesi → **CORS origins** → **Add CORS origin**
+- Site adresini ekle: `https://SENIN-SITEN.vercel.app` (Allow credentials: AÇIK ✓)
 
-Tüm düzenlenebilir içerik `src/data.js` dosyasında:
-- `DUYURULAR` → yeni ilan ekle; `popup: true` verirsen açılışta pop-up olur
-- `PARTNERLER` → partner üniversite ekle/çıkar
-- `HAREKETLILIK` → her türün sayfa içerikleri (koşullar, süreç, belgeler)
-- `ISTATISTIKLER` → ana sayfadaki sayaçlar (örnek verileri gerçekleriyle değiştir!)
+### 5. Panele gir
+- `SENIN-SITEN.vercel.app/admin` → Sanity hesabınla giriş yap
+- Duyuru, partner, sayfa, istatistik ekle → **Publish** → saniyeler içinde sitede!
 
-Değişikliği GitHub'a push'ladığında Vercel otomatik yeniden deploy eder.
+## Panelden neler yönetilir?
+| İçerik | Ne yapar |
+|---|---|
+| **Duyurular** | Ana sayfadaki dönen kart + "popup" kutucuğu işaretlenirse açılış pop-up'ı |
+| **Partner Üniversiteler** | Filtrelenebilir liste (ülke/tür otomatik) |
+| **Sayfalar** | Menüye yeni sekme ekler — panelde sayfa oluştur, navbar'da belirir |
+| **İstatistikler** | Ana sayfadaki sayaçlar |
+
+## Önemli
+- CMS boşken site `src/data.js` içindeki yedek içeriği gösterir. Panele gerçek
+  içerikleri girince otomatik CMS'e geçer.
+- Popup için aynı anda SADECE BİR duyuruda "popup" kutucuğu açık olmalı.
+- Hareketlilik sayfa içerikleri (koşullar/süreç/belgeler) şimdilik `src/data.js`'te —
+  istenirse o da CMS'e taşınabilir.
